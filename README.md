@@ -1,5 +1,11 @@
 <a name="readme-top"></a>
-[![Contributors][contributors-shield]][contributors-url] [![Forks][forks-shield]][forks-url] [![Stargazers][stars-shield]][stars-url] [![Issues][issues-shield]][issues-url] [![MIT License][license-shield]][license-url]
+
+[![Python][python-shield]][python-url]
+[![Contributors][contributors-shield]][contributors-url] 
+[![Forks][forks-shield]][forks-url] 
+[![Stargazers][stars-shield]][stars-url] 
+[![Issues][issues-shield]][issues-url] 
+[![MIT License][license-shield]][license-url]
 
 <!-- PROJECT LOGO -->
 <br />
@@ -104,14 +110,16 @@ To be completed
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/lx-dev-pm/edsm-reader.svg?style=for-the-badge
+[python-shield]: https://img.shields.io/badge/python-3.10.6-blue.svg
+[python-url]: https://www.python.org/downloads/release/python-3106
+[contributors-shield]: https://img.shields.io/github/contributors/lx-dev-pm/edsm-reader.svg
 [contributors-url]: https://github.com/lx-dev-pm/edsm-reader/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/lx-dev-pm/edsm-reader.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/lx-dev-pm/edsm-reader.svg
 [forks-url]: https://github.com/lx-dev-pm/edsm-reader/network/members
-[stars-shield]: https://img.shields.io/github/stars/lx-dev-pm/edsm-reader.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/lx-dev-pm/edsm-reader.svg
 [stars-url]: https://github.com/lx-dev-pm/edsm-reader/stargazers
-[issues-shield]: https://img.shields.io/github/issues/lx-dev-pm/edsm-reader.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/lx-dev-pm/edsm-reader.svg
 [issues-url]: https://github.com/lx-dev-pm/edsm-reader/issues
-[license-shield]: https://img.shields.io/github/license/lx-dev-pm/edsm-reader.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/lx-dev-pm/edsm-reader.svg
 [license-url]: https://github.com/lx-dev-pm/edsm-reader/blob/main/LICENSE
 

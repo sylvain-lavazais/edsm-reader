@@ -20,6 +20,7 @@
 .idea/**/dictionaries
 .idea/**/shelf
 .idea/aws.xml
+.idea/sonarlint/**/*
 
 # Generated files
 .idea/**/contentModel.xml
