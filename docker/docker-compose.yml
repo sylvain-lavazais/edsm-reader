@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  database:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: edsm-mirror
+      POSTGRES_USER: edsm-mirror
+      POSTGRES_DB: edsm-mirror
+    ports:
+      - 5432:5432
+    volumes:
+      - "edsm-mirror-db:/var/lib/postgresql/data"
+      - "./init-scripts:/docker-entrypoint-initdb.d"
+    command: ["postgres", "-c", "log_statement=all"]
+
+volumes:
+  edsm-mirror-db:
+    external: true
