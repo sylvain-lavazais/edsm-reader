@@ -1,0 +1,193 @@
+from datetime import datetime
+
+
+class Body:
+    _key: dict
+    _system_key: dict
+    _name: str
+    _type: str
+    _sub_type: str
+    _discovery: dict
+    _update_time: datetime
+    _materials: dict
+    _solid_composition: dict
+    _atmosphere_composition: dict
+    _parents: dict
+    _belts: dict
+    _rings: dict
+    _properties: dict
+
+    @property
+    def key(self) -> dict:
+        return self._key
+
+    @key.setter
+    def key(self, value: dict):
+        self._key = value
+
+    @property
+    def system_key(self) -> dict:
+        return self._system_key
+
+    @system_key.setter
+    def system_key(self, value: dict):
+        self._system_key = value
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, value: str):
+        self._name = value
+
+    @property
+    def type(self) -> str:
+        return self._type
+
+    @type.setter
+    def type(self, value: str):
+        self._type = value
+
+    @property
+    def sub_type(self) -> str:
+        return self._sub_type
+
+    @sub_type.setter
+    def sub_type(self, value: str):
+        self.sub_type = value
+
+    @property
+    def discovery(self) -> dict:
+        return self._discovery
+
+    @discovery.setter
+    def discovery(self, value: dict):
+        self._discovery = value
+
+    @property
+    def update_time(self) -> datetime:
+        return self._update_time
+
+    @update_time.setter
+    def update_time(self, value: datetime):
+        self._update_time = value
+
+    @property
+    def materials(self) -> dict:
+        return self._materials
+
+    @materials.setter
+    def materials(self, value: dict):
+        self._materials = value
+
+    @property
+    def solid_composition(self) -> dict:
+        return self._solid_composition
+
+    @solid_composition.setter
+    def solid_composition(self, value: dict):
+        self._solid_composition = value
+
+    @property
+    def atmosphere_composition(self) -> dict:
+        return self._atmosphere_composition
+
+    @atmosphere_composition.setter
+    def atmosphere_composition(self, value: dict):
+        self._atmosphere_composition = value
+
+    @property
+    def parents(self) -> dict:
+        return self._parents
+
+    @parents.setter
+    def parents(self, value: dict):
+        self._parents = value
+
+    @property
+    def belts(self) -> dict:
+        return self._belts
+
+    @belts.setter
+    def belts(self, value: dict):
+        self._belts = value
+
+    @property
+    def rings(self) -> dict:
+        return self._rings
+
+    @rings.setter
+    def rings(self, value: dict):
+        self._rings = value
+
+    @property
+    def properties(self) -> dict:
+        return self._properties
+
+    @properties.setter
+    def properties(self, value: dict):
+        self._properties = value
+
+    def __init__(self, dict_from_db: dict = None,
+                 key: dict = None,
+                 system_key: dict = None,
+                 name: str = None,
+                 body_type: str = None,
+                 sub_type: str = None,
+                 discovery: dict = None,
+                 update_time: datetime = None,
+                 materials: dict = None,
+                 solid_composition: dict = None,
+                 atmosphere_composition: dict = None,
+                 parents: dict = None,
+                 belts: dict = None,
+                 rings: dict = None,
+                 properties: dict = None):
+        if dict_from_db is not None:
+            key = dict_from_db['key']
+            system_key = dict_from_db['system_key']
+            name = dict_from_db['name']
+            body_type = dict_from_db['type']
+            sub_type = dict_from_db['sub_type']
+            discovery = dict_from_db['discovery']
+            update_time = dict_from_db['update_time']
+            materials = dict_from_db['materials']
+            solid_composition = dict_from_db['solid_composition']
+            atmosphere_composition = dict_from_db['atmosphere_composition']
+            parents = dict_from_db['parents']
+            belts = dict_from_db['belts']
+            rings = dict_from_db['rings']
+            properties = dict_from_db['properties']
+        self._key = key
+        self._system_key = system_key
+        self._name = name
+        self._type = body_type
+        self._sub_type = sub_type
+        self._discovery = discovery
+        self._update_time = update_time
+        self._materials = materials
+        self._solid_composition = solid_composition
+        self._atmosphere_composition = atmosphere_composition
+        self._parents = parents
+        self._belts = belts
+        self._rings = rings
+        self._properties = properties
+
+    def to_dict(self):
+        return {
+            'key': self._key,
+            'system_key': self._system_key,
+            'name': self._name,
+            'type': self._type,
+            'sub_type': self._sub_type,
+            'discovery': self._discovery,
+            'update_time': self._update_time,
+            'materials': self._materials,
+            'solid_composition': self._solid_composition,
+            'atmosphere_composition': self._atmosphere_composition,
+            'parents': self._parents,
+            'belts': self._belts,
+            'rings': self._rings,
+            'properties': self._properties,
+        }
