@@ -39,7 +39,7 @@
 .idea/**/libraries
 
 # Gradle and Maven with auto-import
-# When using Gradle or Maven with auto-import, you should exclude module files,
+# When using Gradle or Maven with auto-import, you should exclude src files,
 # since they will be recreated, and may cause churn.  Uncomment if using
 # auto-import.
 # .idea/artifacts
@@ -354,4 +354,8 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# app context
+systemsWithCoordinates.json.gz
+systemsWithCoordinates.json
 

@@ -1,13 +1,11 @@
-import json
 import os
 
 import click
 
-from io.database import Database
-from io.file import File
-
-from services.system_service import SystemService
-from error.system_not_found import SystemNotFound
+from .io.database import Database
+from .io.file import File
+from .services.sync_state_service import SyncStateService
+from .services.system_service import SystemService
 
 
 class EDSMReader:
@@ -20,7 +18,7 @@ class EDSMReader:
         self.api_key = api_key
         self.commander_name = commander_name
         database = self.__build_db_from_param()
-        self.system_service = SystemService(database)
+        self.sync_state_service = SyncStateService(database)
         self.file_tools = File(init_file_path)
 
     def __build_db_from_param(self):
@@ -38,8 +36,9 @@ class EDSMReader:
         print(f'-> Reading file done {len(json_data)} entries')
         for elem in json_data:
             if "id" in elem and "id64" in elem:
-                key = json.dumps({'id': elem['id'], 'id64': elem['id64']})
-                print(f'--> Reading {key} in sync db')
+                print(f'--> Reading {elem} in sync db')
+                self.sync_state_service.refresh_one_sync_state(elem)
+
 
 @click.command(no_args_is_help=True)
 @click.option('--api_key', help="The EDSM api key")
