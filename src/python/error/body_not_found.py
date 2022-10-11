@@ -1,0 +1,2 @@
+class BodyNotFound(Exception):
+    pass

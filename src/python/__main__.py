@@ -40,12 +40,6 @@ class EDSMReader:
             if "id" in elem and "id64" in elem:
                 key = json.dumps({'id': elem['id'], 'id64': elem['id64']})
                 print(f'--> Reading {key} in sync db')
-                try:
-                    system = self.system_service.read_system_by_key(key)
-                except SystemNotFound:
-                    print("system doesn't exist in db")
-
-
 
 @click.command(no_args_is_help=True)
 @click.option('--api_key', help="The EDSM api key")
