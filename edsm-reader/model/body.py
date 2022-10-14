@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 
@@ -145,20 +146,20 @@ class Body:
                  rings: dict = None,
                  properties: dict = None):
         if dict_from_db is not None:
-            key = dict_from_db['key']
-            system_key = dict_from_db['system_key']
-            name = dict_from_db['name']
-            body_type = dict_from_db['type']
-            sub_type = dict_from_db['sub_type']
-            discovery = dict_from_db['discovery']
-            update_time = dict_from_db['update_time']
-            materials = dict_from_db['materials']
-            solid_composition = dict_from_db['solid_composition']
-            atmosphere_composition = dict_from_db['atmosphere_composition']
-            parents = dict_from_db['parents']
-            belts = dict_from_db['belts']
-            rings = dict_from_db['rings']
-            properties = dict_from_db['properties']
+            key = dict_from_db.get('key', None)
+            system_key = dict_from_db.get('system_key', None)
+            name = dict_from_db.get('name', None)
+            body_type = dict_from_db.get('type', None)
+            sub_type = dict_from_db.get('sub_type', None)
+            discovery = dict_from_db.get('discovery', None)
+            update_time = dict_from_db.get('update_time', None)
+            materials = dict_from_db.get('materials', None)
+            solid_composition = dict_from_db.get('solid_composition', None)
+            atmosphere_composition = dict_from_db.get('atmosphere_composition', None)
+            parents = dict_from_db.get('parents', None)
+            belts = dict_from_db.get('belts', None)
+            rings = dict_from_db.get('rings', None)
+            properties = dict_from_db.get('properties', None)
         self._key = key
         self._system_key = system_key
         self._name = name
@@ -190,4 +191,22 @@ class Body:
             'belts': self._belts,
             'rings': self._rings,
             'properties': self._properties,
+        }
+
+    def to_dict_for_db(self):
+        return {
+            'key': json.dumps(self._key),
+            'system_key': json.dumps(self._system_key),
+            'name': self._name,
+            'type': self._type,
+            'sub_type': self._sub_type,
+            'discovery': json.dumps(self._discovery),
+            'update_time': self._update_time,
+            'materials': json.dumps(self._materials),
+            'solid_composition': json.dumps(self._solid_composition),
+            'atmosphere_composition': json.dumps(self._atmosphere_composition),
+            'parents': json.dumps(self._parents),
+            'belts': json.dumps(self._belts),
+            'rings': json.dumps(self._rings),
+            'properties': json.dumps(self._properties),
         }

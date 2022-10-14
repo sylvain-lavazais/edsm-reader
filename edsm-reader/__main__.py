@@ -1,25 +1,27 @@
+import logging
 import os
 
 import click
+import structlog as structlog
 
 from .io.database import Database
 from .io.file import File
 from .services.sync_state_service import SyncStateService
-from .services.system_service import SystemService
 
 
 class EDSMReader:
-    api_key: str
-    commander_name: str
-    system_service: SystemService
-    file_tools: File
+    _sync_state_service: SyncStateService
+    _file_tools: File
 
-    def __init__(self, api_key: str, commander_name: str, init_file_path: str):
-        self.api_key = api_key
-        self.commander_name = commander_name
+    def __init__(self, api_key: str, commander_name: str, init_file_path: str, log_level: str):
         database = self.__build_db_from_param()
-        self.sync_state_service = SyncStateService(database)
-        self.file_tools = File(init_file_path)
+        self._sync_state_service = SyncStateService(database, api_key, commander_name)
+        self._file_tools = File(init_file_path)
+
+        structlog.configure(
+            wrapper_class=structlog.make_filtering_bound_logger(logging.getLevelName(log_level)),
+        )
+        self._log = structlog.get_logger()
 
     def __build_db_from_param(self):
         db_host = os.getenv("DB_HOST", default="localhost")
@@ -31,13 +33,13 @@ class EDSMReader:
         return database
 
     def init_sync_from_edsm(self):
-        print('-> Reading file...')
-        json_data = self.file_tools.read_json_file()
-        print(f'-> Reading file done {len(json_data)} entries')
+        self._log.info('Reading file...')
+        json_data = self._file_tools.read_json_file()
+        self._log.info(f'Reading file done {len(json_data)} entries')
         for elem in json_data:
             if "id" in elem and "id64" in elem:
-                print(f'--> Reading {elem} in sync db')
-                self.sync_state_service.refresh_one_sync_state(elem)
+                self._log.info(f'Reading {elem} in sync db')
+                self._sync_state_service.refresh_one_sync_state(elem)
 
 
 @click.command(no_args_is_help=True)
@@ -50,7 +52,7 @@ def command_line(api_key: str, commander_name: str, init_file_path: str):
     example: python __main__.py --api_key [key] --commander_name [name]
     """
     print(f'=== Starting {EDSMReader.__name__} ===')
-    edsm_reader = EDSMReader(api_key, commander_name, init_file_path)
+    edsm_reader = EDSMReader(api_key, commander_name, init_file_path, 'INFO')
     edsm_reader.init_sync_from_edsm()
 
 

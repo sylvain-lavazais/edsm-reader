@@ -1,3 +1,8 @@
+import json
+
+import structlog
+
+from ..decorator.logit import logit
 from ..error.system_not_found import SystemNotFound
 from ..io.database import Database
 from ..model.system import System
@@ -35,23 +40,28 @@ delete from system where key = %(key)s
 
 
 class SystemService:
-    io_db: Database
+    _io_db: Database
 
     def __init__(self, db: Database):
-        self.io_db = db
+        self._io_db = db
+        self._log = structlog.get_logger()
 
+    @logit
     def read_system_by_key(self, key: dict) -> System:
-        raw_data = self.io_db.exec_db_read(SYSTEM_SELECT_BY_KEY, key)
+        raw_data = self._io_db.exec_db_read(SYSTEM_SELECT_BY_KEY, {'key': json.dumps(key)})
         if len(raw_data) == 1:
             return System(raw_data[0])
         else:
             raise SystemNotFound()
 
+    @logit
     def create_system(self, system: System) -> None:
-        self.io_db.exec_db_write(SYSTEM_INSERT, system.to_dict())
+        self._io_db.exec_db_write(SYSTEM_INSERT, system.to_dict_for_db())
 
+    @logit
     def update_system_by_key(self, system: System) -> None:
-        self.io_db.exec_db_write(SYSTEM_UPDATE_BY_KEY, system.to_dict())
+        self._io_db.exec_db_write(SYSTEM_UPDATE_BY_KEY, system.to_dict_for_db())
 
+    @logit
     def delete_system_by_key(self, key: dict) -> None:
-        self.io_db.exec_db_write(SYSTEM_DELETE_BY_KEY, key)
+        self._io_db.exec_db_write(SYSTEM_DELETE_BY_KEY, key)

@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 
@@ -76,13 +77,13 @@ class System:
                  update_time: datetime = None,
                  primary_star: dict = None):
         if dict_from_db is not None:
-            key = dict_from_db['key']
-            name = dict_from_db['name']
-            coordinates = dict_from_db['coordinates']
-            require_permit = dict_from_db['require_permit']
-            information = dict_from_db['information']
-            update_time = dict_from_db['update_time']
-            primary_star = dict_from_db['primary_star']
+            key = dict_from_db.get('key', None)
+            name = dict_from_db.get('name', None)
+            coordinates = dict_from_db.get('coordinates', None)
+            require_permit = dict_from_db.get('require_permit', None)
+            information = dict_from_db.get('information', None)
+            update_time = dict_from_db.get('update_time', None)
+            primary_star = dict_from_db.get('primary_star', None)
         self._key = key
         self._name = name
         self._coordinates = coordinates
@@ -101,3 +102,30 @@ class System:
             'update_time': self._update_time,
             'primary_star': self._primary_star,
         }
+
+    def to_dict_for_db(self) -> dict:
+        return {
+            'key': json.dumps(self._key),
+            'name': self._name,
+            'coordinates': json.dumps(self._coordinates),
+            'require_permit': self._require_permit,
+            'information': json.dumps(self._information),
+            'update_time': self._update_time,
+            'primary_star': json.dumps(self._primary_star),
+        }
+
+
+def from_edsm(edsm_res: dict) -> System:
+    key = {'id': edsm_res['id'], 'id64': edsm_res['id64']}
+    name = edsm_res['name']
+    coordinates = edsm_res['coords']
+    require_permit = edsm_res['requirePermit']
+    information = edsm_res['information']
+    primary_star = edsm_res['primaryStar']
+    return System(key=key,
+                  name=name,
+                  coordinates=coordinates,
+                  require_permit=require_permit,
+                  information=information,
+                  update_time=datetime.now(),
+                  primary_star=primary_star)
