@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+from typing import Optional
 
 import structlog
 
@@ -69,12 +71,13 @@ class BodyService:
         self._log = structlog.get_logger()
 
     @logit
-    def read_body_by_key(self, key: dict) -> Body:
+    def read_body_by_key(self, key: dict) -> Optional[Body]:
         raw_data = self._io_db.exec_db_read(BODY_SELECT_BY_KEY, {'key': json.dumps(key)})
-        if len(raw_data) == 1:
+        if raw_data is not None and len(raw_data) > 0:
             return Body(raw_data[0])
         else:
-            raise BodyNotFound()
+            self._log.debug("No body found")
+            return None
 
     @logit
     def read_body_by_system_key(self, system_key: dict) -> Body:
@@ -86,11 +89,13 @@ class BodyService:
 
     @logit
     def create_body(self, body: Body) -> None:
-        self._io_db.exec_db_write(BODY_INSERT, body.to_dict())
+        body.update_time = datetime.now()
+        self._io_db.exec_db_write(BODY_INSERT, body.to_dict_for_db())
 
     @logit
     def update_body_by_key(self, body: Body) -> None:
-        self._io_db.exec_db_write(BODY_UPDATE_BY_KEY, body.to_dict())
+        body.update_time = datetime.now()
+        self._io_db.exec_db_write(BODY_UPDATE_BY_KEY, body.to_dict_for_db())
 
     @logit
     def delete_body_by_key(self, key: dict) -> None:

@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+from typing import Optional
 
 import structlog
 
@@ -47,19 +49,22 @@ class SystemService:
         self._log = structlog.get_logger()
 
     @logit
-    def read_system_by_key(self, key: dict) -> System:
+    def read_system_by_key(self, key: dict) -> Optional[System]:
         raw_data = self._io_db.exec_db_read(SYSTEM_SELECT_BY_KEY, {'key': json.dumps(key)})
-        if len(raw_data) == 1:
+        if raw_data is not None and len(raw_data) > 0:
             return System(raw_data[0])
         else:
-            raise SystemNotFound()
+            self._log.debug("No system found")
+            return None
 
     @logit
     def create_system(self, system: System) -> None:
+        system.update_time = datetime.now()
         self._io_db.exec_db_write(SYSTEM_INSERT, system.to_dict_for_db())
 
     @logit
     def update_system_by_key(self, system: System) -> None:
+        system.update_time = datetime.now()
         self._io_db.exec_db_write(SYSTEM_UPDATE_BY_KEY, system.to_dict_for_db())
 
     @logit

@@ -115,17 +115,16 @@ class System:
         }
 
 
-def from_edsm(edsm_res: dict) -> System:
+def system_from_edsm(edsm_res: dict) -> System:
     key = {'id': edsm_res['id'], 'id64': edsm_res['id64']}
-    name = edsm_res['name']
-    coordinates = edsm_res['coords']
-    require_permit = edsm_res['requirePermit']
-    information = edsm_res['information']
-    primary_star = edsm_res['primaryStar']
+    name = edsm_res.get('name', None)
+    coordinates = edsm_res.get('coords', None)
+    require_permit = edsm_res.get('requirePermit', None)
+    information = edsm_res.get('information', None)
+    primary_star = edsm_res.get('primaryStar', None)
     return System(key=key,
                   name=name,
                   coordinates=coordinates,
                   require_permit=require_permit,
                   information=information,
-                  update_time=datetime.now(),
                   primary_star=primary_star)

@@ -1,8 +1,11 @@
 import os
+from typing import List
 
 import requests
 import structlog
 from requests import Response
+
+from ..decorator.logit import logit
 
 SYSTEM_PREFIX = "api-v1/"
 BODY_PREFIX = "api-system-v1/"
@@ -35,7 +38,10 @@ class EdsmClient:
                 'includeHidden': 1,
                 'showId': 1,
             }
+        else:
+            return {}
 
+    @logit
     def get_system_from_system_id(self, system_id: int) -> dict:
         params = self.__get_generic_by_entity(SYSTEM_ENTITY)
         params.update({'systemId': system_id})
@@ -47,6 +53,7 @@ class EdsmClient:
         else:
             return response.json()
 
+    @logit
     def get_system_from_system_name(self, system_name: str) -> dict:
         params = self.__get_generic_by_entity(SYSTEM_ENTITY)
         params.update({'systemName': system_name})
@@ -58,7 +65,8 @@ class EdsmClient:
         else:
             return response.json()
 
-    def get_body_from_system_id(self, system_id: int) -> dict:
+    @logit
+    def get_bodies_from_system_id(self, system_id: int) -> List[dict]:
         params = self.__get_generic_by_entity(BODY_ENTITY)
         params.update({'systemId': system_id})
         url = self.__get_url(BODY_PREFIX, BODY_ENTITY)
@@ -67,9 +75,13 @@ class EdsmClient:
         if response.status_code != 200:
             raise requests.HTTPError(f"Unable to retrieve {BODY_ENTITY} : {response.text}")
         else:
-            return response.json()
+            if 'bodies' in response.json():
+                return response.json()['bodies']
+            else:
+                return []
 
-    def get_body_from_system_name(self, system_name: str) -> dict:
+    @logit
+    def get_body_from_system_name(self, system_name: str) -> List[dict]:
         params = self.__get_generic_by_entity(BODY_ENTITY)
         params.update({'systemName': system_name})
         url = self.__get_url(BODY_PREFIX, BODY_ENTITY)
@@ -78,4 +90,7 @@ class EdsmClient:
         if response.status_code != 200:
             raise requests.HTTPError(f"Unable to retrieve {BODY_ENTITY} : {response.text}")
         else:
-            return response.json()
+            if 'bodies' in response.json():
+                return response.json()['bodies']
+            else:
+                return []

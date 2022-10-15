@@ -1,4 +1,4 @@
-from typing import List, Any
+from typing import List
 
 import psycopg2
 import structlog
@@ -39,7 +39,7 @@ class Database:
             with self.__db_connection() as connection:
                 with connection.cursor(cursor_factory=DictCursor) as cursor:
                     cursor.execute(query, param)
-                    self._log.info(f'executing query [{log_query}]')
+                    self._log.debug(f'executing query [{log_query}]')
                     self._log.debug(f'with param [{param}]')
                     return cursor.fetchall()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -51,7 +51,7 @@ class Database:
             with self.__db_connection() as connection:
                 with connection.cursor() as cursor:
                     cursor.execute(query, params)
-                    self._log.info(f'executing query [{log_query}]')
+                    self._log.debug(f'executing query [{log_query}]')
                     connection.commit()
         except (Exception, psycopg2.DatabaseError) as error:
             self._log.error(f'Error occur on write of {log_query} - {error}')

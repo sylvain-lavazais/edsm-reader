@@ -210,3 +210,51 @@ class Body:
             'rings': json.dumps(self._rings),
             'properties': json.dumps(self._properties),
         }
+
+
+def body_from_edsm(edsm_res: dict) -> Body:
+    key = {'id': edsm_res['id'], 'id64': edsm_res['id64']}
+    name = edsm_res.get('name', None)
+    body_type = edsm_res.get('type', None)
+    sub_type = edsm_res.get('subType', None)
+    discovery = edsm_res.get('discovery', None)
+    materials = edsm_res.get('materials', None)
+    solid_composition = edsm_res.get('solidComposition', None)
+    atmosphere_composition = edsm_res.get('atmosphereComposition', None)
+    parents = edsm_res.get('parents', None)
+    belts = edsm_res.get('belts', None)
+    rings = edsm_res.get('rings', None)
+    properties = {
+        'body_id': edsm_res.get('bodyId', None),
+        'distance_to_arrival': edsm_res.get('distanceToArrival', None),
+        'is_landable': edsm_res.get('isLandable', None),
+        'gravity': edsm_res.get('gravity', None),
+        'earth_masses': edsm_res.get('earthMasses', None),
+        'radius': edsm_res.get('radius', None),
+        'surface_temperature': edsm_res.get('surfaceTemperature', None),
+        'surface_pressure': edsm_res.get('surfacePressure', None),
+        'volcanism_type': edsm_res.get('volcanismType', None),
+        'atmosphere_type': edsm_res.get('atmosphereType', None),
+        'terraforming_state': edsm_res.get('terraformingState', None),
+        'orbital_period': edsm_res.get('orbitalPeriod', None),
+        'semi_major_axis': edsm_res.get('semiMajorAxis', None),
+        'orbital_eccentricity': edsm_res.get('orbitalEccentricity', None),
+        'orbital_inclination': edsm_res.get('orbitalInclination', None),
+        'arg_of_periapsis': edsm_res.get('argOfPeriapsis', None),
+        'rotational_period': edsm_res.get('rotationalPeriod', None),
+        'rotational_period_tidally_locked': edsm_res.get('rotationalPeriodTidallyLocked', None),
+        'axial_tilt': edsm_res.get('axialTilt', None),
+        'reserve_level': edsm_res.get('reserveLevel', None),
+    }
+    return Body(key=key,
+                name=name,
+                body_type=body_type,
+                sub_type=sub_type,
+                discovery=discovery,
+                materials=materials,
+                solid_composition=solid_composition,
+                atmosphere_composition=atmosphere_composition,
+                parents=parents,
+                belts=belts,
+                rings=rings,
+                properties=properties)

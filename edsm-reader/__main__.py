@@ -33,13 +33,9 @@ class EDSMReader:
         return database
 
     def init_sync_from_edsm(self):
-        self._log.info('Reading file...')
-        json_data = self._file_tools.read_json_file()
-        self._log.info(f'Reading file done {len(json_data)} entries')
-        for elem in json_data:
-            if "id" in elem and "id64" in elem:
-                self._log.info(f'Reading {elem} in sync db')
-                self._sync_state_service.refresh_one_sync_state(elem)
+        self._log.info('Starting init database from file')
+        self._file_tools.read_json_file_and_exec(self._sync_state_service.refresh_system_list)
+        self._log.info('End of init...')
 
 
 @click.command(no_args_is_help=True)
