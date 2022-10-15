@@ -7,7 +7,7 @@ import structlog
 from ..decorator.logit import logit
 from ..error.body_not_found import BodyNotFound
 from ..io.database import Database
-from ..model.body import Body
+from ..models.body import Body
 
 BODY_SELECT_BY_KEY = '''
 select key, system_key, name, type,

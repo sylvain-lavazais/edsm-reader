@@ -58,6 +58,8 @@ setup(
         "click~=8.1.3",
         "requests~=2.28.1",
         "structlog~=22.1.0",
+        "ratelimit~=2.2.1",
+        "backoff~=2.2.1"
     ],  # Optional
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"

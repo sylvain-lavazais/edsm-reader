@@ -5,9 +5,8 @@ from typing import Optional
 import structlog
 
 from ..decorator.logit import logit
-from ..error.system_not_found import SystemNotFound
 from ..io.database import Database
-from ..model.system import System
+from ..models.system import System
 
 SYSTEM_SELECT_BY_KEY = '''
 select key, name, coordinates, require_permit, 
