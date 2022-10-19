@@ -45,6 +45,7 @@ class InitOrchestrator:
         edsm_bodies = self._edsm_client.get_bodies_from_system_id(key['id'])
         if len(edsm_bodies) > 0:
             self._log.info(f'=> Processing {len(edsm_bodies)} bodies for system {key}')
+
             for edsm_body in edsm_bodies:
 
                 body_key = {'id': edsm_body['id'], 'id64': edsm_body['id64']}
@@ -52,10 +53,12 @@ class InitOrchestrator:
 
                 if body_state is not None:
                     edsm_body_hash = self.__compute_hash_of_dict(edsm_body)
+
                     if edsm_body_hash != body_state.sync_hash:
                         previous_body_state = self.__update_create_body(body_key, edsm_body)
                         self.__update_sync_state(edsm_body_hash, body_key, 'body',
                                                  previous_body_state)
+
                 else:
                     body = body_from_edsm(edsm_body)
                     body.system_key = key
@@ -65,23 +68,30 @@ class InitOrchestrator:
     def __refresh_system_entity(self, key: dict):
         sync_state = self._state_service.read_sync_state_by_key(key)
         edsm_system = self._edsm_client.get_system_from_system_id(key['id'])
+
         if sync_state is not None:
             edsm_sys_hash = self.__compute_hash_of_dict(edsm_system)
+
             if edsm_sys_hash != sync_state.sync_hash:
                 previous_system_state = self.__update_create_system(edsm_system, key)
                 self.__update_sync_state(edsm_sys_hash, key, 'system', previous_system_state)
+
         else:
+
             self._system_service.create_system(system_from_edsm(edsm_system))
             self.__create_sync_state(edsm_system, key, 'system')
 
     def __update_create_body(self, body_key: dict, edsm_body: dict) -> Optional[dict]:
         body = self._body_service.read_body_by_key(body_key)
+
         if body is not None:
             previous_state = body.to_dict_for_db()
             self._body_service.update_body_by_key(body_from_edsm(edsm_body))
             return previous_state
+
         else:
             self._body_service.create_body(body_from_edsm(edsm_body))
+
         return None
 
     def __update_create_system(self, key: dict, edsm_system: dict) -> Optional[dict]:
@@ -90,32 +100,32 @@ class InitOrchestrator:
             previous_state = system.to_dict_for_db()
             self._system_service.update_system_by_key(system_from_edsm(edsm_system))
             return previous_state
+
         else:
             self._system_service.create_system(system_from_edsm(edsm_system))
+
         return None
 
     def __update_sync_state(self, object_hash: str, key_to_save: dict, data_type: str,
                             previous_state: dict = None) -> None:
         new_sync = SyncState(
-            key=key_to_save,
-            sync_date=datetime.now(),
-            data_type=data_type,
-            sync_hash=object_hash,
-            previous_state=previous_state
+                key=key_to_save,
+                data_type=data_type,
+                sync_hash=object_hash,
+                previous_state=previous_state
         )
-        self._state_service.update_sync_state_by_key(new_sync)
+        self._state_service.update_sync_state(new_sync)
 
     def __create_sync_state(self, edsm_dict: dict, key_to_save: dict, data_type: str) -> None:
         sync = SyncState(
-            key=key_to_save,
-            sync_date=datetime.now(),
-            data_type=data_type,
-            sync_hash=self.__compute_hash_of_dict(edsm_dict)
+                key=key_to_save,
+                data_type=data_type,
+                sync_hash=self.__compute_hash_of_dict(edsm_dict)
         )
         self._state_service.create_sync_state(sync)
 
     def __compute_hash_of_dict(self, data: dict) -> str:
         result = hashlib.sha256(
-            bytes(json.dumps(data, sort_keys=True, default=str), 'utf-8')).hexdigest()
+                bytes(json.dumps(data, sort_keys=True, default=str), 'utf-8')).hexdigest()
         self._log.debug(f'hash of {data} = {result}')
         return result

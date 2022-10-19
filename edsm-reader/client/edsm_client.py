@@ -90,6 +90,7 @@ class EdsmClient:
                 f"Status: {response.status_code}, "
                 f"Response: {response.text}")
         else:
+            self.__log_remaining_rate(response)
             if 'bodies' in response.json():
                 return response.json()['bodies']
             else:
@@ -110,7 +111,13 @@ class EdsmClient:
                 f"Status: {response.status_code}, "
                 f"Response: {response.text}")
         else:
+            self.__log_remaining_rate(response)
             if 'bodies' in response.json():
                 return response.json()['bodies']
             else:
                 return []
+
+    def __log_remaining_rate(self, response):
+        if 'x-rate-limit-remaining' in response.headers:
+            self._log.debug(
+                f'remaining call to rate-limit: {response.headers["x-rate-limit-remaining"]}')

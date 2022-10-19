@@ -4,18 +4,18 @@ import os
 import click
 import structlog as structlog
 
+from .orchestrator.init_orchestrator import InitOrchestrator
 from .io.database import Database
 from .io.file import File
-from .services.sync_state_service import SyncStateService
 
 
 class EDSMReader:
-    _sync_state_service: SyncStateService
+    _orchestrator: InitOrchestrator
     _file_tools: File
 
     def __init__(self, api_key: str, commander_name: str, init_file_path: str, log_level: str):
         database = self.__build_db_from_param()
-        self._sync_state_service = SyncStateService(database, api_key, commander_name)
+        self._orchestrator = InitOrchestrator(database, api_key, commander_name)
         self._file_tools = File(init_file_path)
 
         structlog.configure(
@@ -34,7 +34,7 @@ class EDSMReader:
 
     def init_sync_from_edsm(self):
         self._log.info('Starting init database from file')
-        self._file_tools.read_json_file_and_exec(self._sync_state_service.refresh_system_list)
+        self._file_tools.read_json_file_and_exec(self._orchestrator.refresh_system_list)
         self._log.info('End of init...')
 
 

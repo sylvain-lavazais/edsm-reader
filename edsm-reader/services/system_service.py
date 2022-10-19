@@ -53,7 +53,7 @@ class SystemService:
         if raw_data is not None and len(raw_data) > 0:
             return System(raw_data[0])
         else:
-            self._log.debug("No system found")
+            self._log.debug(f'No {System.__name__} found')
             return None
 
     @logit
@@ -68,4 +68,4 @@ class SystemService:
 
     @logit
     def delete_system_by_key(self, key: dict) -> None:
-        self._io_db.exec_db_write(SYSTEM_DELETE_BY_KEY, key)
+        self._io_db.exec_db_write(SYSTEM_DELETE_BY_KEY, {'key': json.dumps(key)})

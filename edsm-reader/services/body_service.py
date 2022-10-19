@@ -76,7 +76,7 @@ class BodyService:
         if raw_data is not None and len(raw_data) > 0:
             return Body(raw_data[0])
         else:
-            self._log.debug("No body found")
+            self._log.debug(f'No {Body.__name__} found')
             return None
 
     @logit
@@ -99,4 +99,4 @@ class BodyService:
 
     @logit
     def delete_body_by_key(self, key: dict) -> None:
-        self._io_db.exec_db_write(BODY_DELETE_BY_KEY, key)
+        self._io_db.exec_db_write(BODY_DELETE_BY_KEY, {'key': json.dumps(key)})

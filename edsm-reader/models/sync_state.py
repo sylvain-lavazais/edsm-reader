@@ -69,18 +69,18 @@ class SyncState:
 
     def to_dict(self) -> dict:
         return {
-            'key': self._key,
-            'sync_date': self._sync_date,
-            'type': self._type,
-            'sync_hash': self._sync_hash,
-            'previous_state': self._previous_state
+                'key'           : self._key,
+                'sync_date'     : self._sync_date,
+                'type'          : self._type,
+                'sync_hash'     : self._sync_hash,
+                'previous_state': self._previous_state
         }
 
     def to_dict_for_db(self) -> dict:
         return {
-            'key': json.dumps(self._key),
-            'sync_date': self._sync_date,
-            'type': self._type,
-            'sync_hash': self._sync_hash,
-            'previous_state': json.dumps(self._previous_state, default=str)
+                'key'           : json.dumps(self._key),
+                'sync_date'     : self._sync_date,
+                'type'          : self._type,
+                'sync_hash'     : self._sync_hash,
+                'previous_state': json.dumps(self._previous_state, default=str)
         }

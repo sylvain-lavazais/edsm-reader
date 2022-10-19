@@ -94,24 +94,24 @@ class System:
 
     def to_dict(self) -> dict:
         return {
-            'key': self._key,
-            'name': self._name,
-            'coordinates': self._coordinates,
-            'require_permit': self._require_permit,
-            'information': self._information,
-            'update_time': self._update_time,
-            'primary_star': self._primary_star,
+                'key'           : self._key,
+                'name'          : self._name,
+                'coordinates'   : self._coordinates,
+                'require_permit': self._require_permit,
+                'information'   : self._information,
+                'update_time'   : self._update_time,
+                'primary_star'  : self._primary_star,
         }
 
     def to_dict_for_db(self) -> dict:
         return {
-            'key': json.dumps(self._key),
-            'name': self._name,
-            'coordinates': json.dumps(self._coordinates),
-            'require_permit': self._require_permit,
-            'information': json.dumps(self._information),
-            'update_time': self._update_time,
-            'primary_star': json.dumps(self._primary_star),
+                'key'           : json.dumps(self._key),
+                'name'          : self._name,
+                'coordinates'   : json.dumps(self._coordinates),
+                'require_permit': self._require_permit,
+                'information'   : json.dumps(self._information),
+                'update_time'   : self._update_time,
+                'primary_star'  : json.dumps(self._primary_star),
         }
 
 

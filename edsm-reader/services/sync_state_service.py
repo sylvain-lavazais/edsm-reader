@@ -1,5 +1,8 @@
 import json
+from datetime import datetime
 from typing import Optional
+
+import structlog
 
 from ..decorator.logit import logit
 from ..io.database import Database
@@ -35,6 +38,7 @@ class SyncStateService:
 
     def __init__(self, db: Database):
         self._io_db = db
+        self._log = structlog.get_logger()
 
     @logit
     def read_sync_state_by_key(self, key: dict) -> Optional[SyncState]:
@@ -42,17 +46,19 @@ class SyncStateService:
         if raw_data is not None and len(raw_data) > 0:
             return SyncState(raw_data[0])
         else:
-            self._log.debug("No sync-state found")
+            self._log.debug(f'No {SyncState.__name__} found')
             return None
 
     @logit
     def create_sync_state(self, sync_state: SyncState) -> None:
+        sync_state.sync_date = datetime.now()
         self._io_db.exec_db_write(SYNC_STATE_INSERT, sync_state.to_dict_for_db())
 
     @logit
-    def update_sync_state_by_key(self, sync_state: SyncState) -> None:
+    def update_sync_state(self, sync_state: SyncState) -> None:
+        sync_state.sync_date = datetime.now()
         self._io_db.exec_db_write(SYNC_STATE_UPDATE_BY_KEY, sync_state.to_dict_for_db())
 
     @logit
     def delete_sync_state_by_key(self, key: dict) -> None:
-        self._io_db.exec_db_write(SYNC_STATE_DELETE_BY_KEY, key)
+        self._io_db.exec_db_write(SYNC_STATE_DELETE_BY_KEY, {'key': json.dumps(key)})
