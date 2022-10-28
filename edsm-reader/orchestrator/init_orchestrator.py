@@ -1,6 +1,5 @@
 import hashlib
 import json
-from datetime import datetime
 from typing import List, Optional
 
 import structlog
@@ -26,7 +25,9 @@ class InitOrchestrator:
         self._state_service = SyncStateService(db)
         self._body_service = BodyService(db)
         self._system_service = SystemService(db)
+
         self._edsm_client = EdsmClient(api_key, commander_name)
+
         self._log = structlog.get_logger()
 
     @logit

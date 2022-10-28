@@ -1,27 +1,43 @@
 import logging
 import os
+from threading import Thread
 
 import click
 import structlog as structlog
 
-from .orchestrator.init_orchestrator import InitOrchestrator
 from .io.database import Database
 from .io.file import File
+from .orchestrator.eddn_orchestrator import EddnOrchestrator
+from .orchestrator.init_orchestrator import InitOrchestrator
 
 
 class EDSMReader:
-    _orchestrator: InitOrchestrator
+    _init_orchestrator: InitOrchestrator
+    _eddn_orchestrator: EddnOrchestrator
     _file_tools: File
+    _parameters: dict
 
-    def __init__(self, api_key: str, commander_name: str, init_file_path: str, log_level: str):
+    def __init__(self, api_key: str, commander_name: str, log_level: str,
+                 init_file_path: str = None):
+        self._parameters = {}
         database = self.__build_db_from_param()
-        self._orchestrator = InitOrchestrator(database, api_key, commander_name)
-        self._file_tools = File(init_file_path)
+        self._init_orchestrator = InitOrchestrator(database, api_key, commander_name)
+        self._eddn_orchestrator = EddnOrchestrator(database)
+        if init_file_path is not None:
+            self._file_tools = File(init_file_path)
 
         structlog.configure(
-            wrapper_class=structlog.make_filtering_bound_logger(logging.getLevelName(log_level)),
+                wrapper_class=structlog.make_filtering_bound_logger(
+                        logging.getLevelName(log_level)),
         )
         self._log = structlog.get_logger()
+
+        self._parameters.update({
+                'api_key'       : api_key,
+                'commander_name': commander_name,
+                'init_file_path': init_file_path,
+                'log_level'     : log_level
+        })
 
     def __build_db_from_param(self):
         db_host = os.getenv("DB_HOST", default="localhost")
@@ -30,26 +46,52 @@ class EDSMReader:
         db_name = os.getenv("DB_NAME", default="edsm-mirror")
         db_password = os.getenv("DB_PASSWORD", default="edsm-mirror")
         database = Database(db_host, db_port, db_user, db_name, db_password)
+
+        self._parameters.update({
+                'db_host'    : db_host,
+                'db_port'    : db_port,
+                'db_user'    : db_user,
+                'db_name'    : db_name,
+                'db_password': '*************',
+        })
+
         return database
 
-    def init_sync_from_edsm(self):
+    def run(self):
+        self._log.debug(f'===  Starting parameters')
+        for key in self._parameters:
+            self._log.debug(f'===  {key}: {self._parameters[key]}')
+
+        if self._file_tools is not None:
+            self.__init_sync_from_edsm()
+
+        self._eddn_orchestrator.run_listener()
+
+    def __init_sync_from_edsm(self):
+        separated_thread = Thread(target=self._file_tools.read_json_file_and_exec,
+                                  args=(self._init_orchestrator.refresh_system_list,), daemon=True)
         self._log.info('Starting init database from file')
-        self._file_tools.read_json_file_and_exec(self._orchestrator.refresh_system_list)
-        self._log.info('End of init...')
+        separated_thread.start()
 
 
 @click.command(no_args_is_help=True)
 @click.option('--api_key', help="The EDSM api key")
 @click.option('--commander_name', help="The EDSM registered commander name")
 @click.option('--init_file_path', help="The file path to the system json file for init")
-def command_line(api_key: str, commander_name: str, init_file_path: str):
+@click.option('--log_level', help="The log level for trace")
+def command_line(api_key: str, commander_name: str, init_file_path: str, log_level: str):
     """Start the edsm reader application
 
-    example: python __main__.py --api_key [key] --commander_name [name]
+    example:
+    python -m edsm-reader \
+    --api_key [<your api_key>] \
+    --commander_name [name] \
+    --init_file_path [path/to/file] \
+    --log_level [CRITICAL|ERROR|WARNING|INFO|DEBUG]
     """
     print(f'=== Starting {EDSMReader.__name__} ===')
-    edsm_reader = EDSMReader(api_key, commander_name, init_file_path, 'INFO')
-    edsm_reader.init_sync_from_edsm()
+    edsm_reader = EDSMReader(api_key, commander_name, log_level, init_file_path)
+    edsm_reader.run()
 
 
 if __name__ == '__main__':

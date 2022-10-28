@@ -7,3 +7,4 @@ structlog~=22.1.0
 ratelimit~=2.2.1
 backoff~=2.2.1
 wheel>=0.37.1
+zmq~=0.0.0

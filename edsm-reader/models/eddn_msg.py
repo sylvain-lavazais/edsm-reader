@@ -3,7 +3,7 @@ from datetime import datetime
 from uuid import UUID
 
 
-class EDDNMsg:
+class EddnMsg:
     _id: UUID
     _schema: str
     _header: dict
@@ -101,11 +101,11 @@ class EDDNMsg:
         }
 
 
-def msg_from_eddn(eddn_recv: dict) -> EDDNMsg:
+def msg_from_eddn(eddn_recv: dict) -> EddnMsg:
     schema = eddn_recv.get('name', None)
     header = eddn_recv.get('type', None)
     message = eddn_recv.get('subType', None)
-    return EDDNMsg(schema=schema,
+    return EddnMsg(schema=schema,
                    header=header,
                    message=message,
                    )

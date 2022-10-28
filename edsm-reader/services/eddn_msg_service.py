@@ -3,7 +3,7 @@ from typing import Optional, List
 
 import structlog
 
-from models.eddn_msg import EDDNMsg
+from ..models.eddn_msg import EddnMsg
 from ..decorator.logit import logit
 from ..io.database import Database
 
@@ -45,7 +45,7 @@ where id = %(id)s
 '''
 
 
-class EDDNMessageService:
+class EddnMessageService:
     _io_db: Database
 
     def __init__(self, db: Database):
@@ -53,33 +53,33 @@ class EDDNMessageService:
         self._log = structlog.get_logger()
 
     @logit
-    def read_eddn_message_by_id(self, uuid: str) -> Optional[EDDNMsg]:
+    def read_eddn_message_by_id(self, uuid: str) -> Optional[EddnMsg]:
         raw_data = self._io_db.exec_db_read(EDDN_MESSAGE_SELECT_BY_ID, {'id': uuid})
         if raw_data is not None and len(raw_data) > 0:
-            return EDDNMsg(raw_data[0])
+            return EddnMsg(raw_data[0])
         else:
-            self._log.debug(f'No {EDDNMsg.__name__} found')
+            self._log.debug(f'No {EddnMsg.__name__} found')
             return None
 
     @logit
-    def read_eddn_message_unread(self) -> Optional[List[EDDNMsg]]:
+    def read_eddn_message_unread(self) -> Optional[List[EddnMsg]]:
         raw_data = self._io_db.exec_db_read(EDDN_MESSAGE_SELECT_BY_ID)
         if raw_data is not None and len(raw_data) > 0:
             eddn_msgs = []
             for data in raw_data:
-                eddn_msgs.append(EDDNMsg(data))
+                eddn_msgs.append(EddnMsg(data))
             return eddn_msgs
         else:
-            self._log.debug(f'No {EDDNMsg.__name__} found')
+            self._log.debug(f'No {EddnMsg.__name__} found')
             return None
 
     @logit
-    def create_eddn_message(self, eddn_msg: EDDNMsg) -> None:
+    def create_eddn_message(self, eddn_msg: EddnMsg) -> None:
         eddn_msg.recv_date = datetime.now()
         self._io_db.exec_db_write(EDDN_MESSAGE_INSERT, eddn_msg.to_dict_for_db())
 
     @logit
-    def update_eddn_message(self, eddn_msg: EDDNMsg) -> None:
+    def update_eddn_message(self, eddn_msg: EddnMsg) -> None:
         self._io_db.exec_db_write(EDDN_MESSAGE_UPDATE_BY_ID, eddn_msg.to_dict_for_db())
 
     @logit

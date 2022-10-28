@@ -1,3 +1,4 @@
+import sys
 from typing import List
 
 import psycopg2
@@ -31,7 +32,8 @@ class Database:
             }
             return psycopg2.connect(**params)
         except (Exception, psycopg2.DatabaseError) as error:
-            self._log.error(f'Error occur on connection to database - {error}')
+            self._log.critical(f'Error occur on connection to database - \n {error}')
+            sys.exit(1)
 
     def exec_db_read(self, query: str, param: dict = None) -> List[dict]:
         log_query = query.replace('\n', '')
