@@ -24,11 +24,11 @@ class Database:
     def __db_connection(self):
         try:
             params = {
-                'database': self.db_name,
-                'user': self.db_user,
-                'password': self.db_pass,
-                'host': self.db_host,
-                'port': self.db_port
+                    'database': self.db_name,
+                    'user'    : self.db_user,
+                    'password': self.db_pass,
+                    'host'    : self.db_host,
+                    'port'    : self.db_port
             }
             return psycopg2.connect(**params)
         except (Exception, psycopg2.DatabaseError) as error:
@@ -44,7 +44,7 @@ class Database:
                     self._log.debug(f'executing query [{log_query}]')
                     self._log.debug(f'with param [{param}]')
                     return cursor.fetchall()
-        except (Exception, psycopg2.DatabaseError) as error:
+        except psycopg2.DatabaseError as error:
             self._log.warn(f'Error occur on read of {log_query} - {error}')
 
     def exec_db_write(self, query: str, params: dict) -> None:
@@ -54,7 +54,7 @@ class Database:
                 with connection.cursor() as cursor:
                     cursor.execute(query, params)
                     self._log.debug(f'executing query [{log_query}]')
-                    connection.commit()
-        except (Exception, psycopg2.DatabaseError) as error:
+                connection.commit()
+        except psycopg2.DatabaseError as error:
             self._log.error(f'Error occur on write of {log_query} - {error}')
             connection.rollback()

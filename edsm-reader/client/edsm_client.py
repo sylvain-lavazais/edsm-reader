@@ -12,10 +12,12 @@ SYSTEM_PREFIX = "api-v1/"
 BODY_PREFIX = "api-system-v1/"
 
 SYSTEM_ENTITY = "system"
+CUBE_SEARCH_ENTITY = "cube-systems"
 BODY_ENTITY = "bodies"
 
-CALL_LIMIT = 10
-CALL_PERIOD_SEC = 60
+BODY_CALL_LIMIT = 10
+SEARCH_CALL_LIMIT = 6
+ONE_MINUTE_CALL_PERIOD = 60
 
 
 class EdsmClient:
@@ -33,14 +35,14 @@ class EdsmClient:
         return f'{self._base_url}{prefix}{entity}'
 
     def __get_generic_param_by_entity(self, entity: str) -> dict:
-        if entity == SYSTEM_ENTITY:
+        if entity == SYSTEM_ENTITY or entity == CUBE_SEARCH_ENTITY:
             return {
-                'showCoordinates': 1,
-                'showPermit': 1,
-                'showPrimaryStar': 1,
-                'showInformation': 1,
-                'includeHidden': 1,
-                'showId': 1,
+                    'showCoordinates': 1,
+                    'showPermit'     : 1,
+                    'showPrimaryStar': 1,
+                    'showInformation': 1,
+                    'includeHidden'  : 1,
+                    'showId'         : 1,
             }
         else:
             return {}
@@ -54,10 +56,12 @@ class EdsmClient:
 
         if response.status_code != 200:
             raise requests.HTTPError(
-                f"Unable to retrieve {SYSTEM_ENTITY} on EDSM - "
-                f"Status: {response.status_code}, "
-                f"Response: {response.text}")
+                    f"Unable to retrieve {SYSTEM_ENTITY} on EDSM - "
+                    f"Status: {response.status_code}, "
+                    f"Response: {response.text}")
         else:
+            if response.json() is None or type(response.json()) is list:
+                return {}
             return response.json()
 
     @logit
@@ -69,15 +73,15 @@ class EdsmClient:
 
         if response.status_code != 200:
             raise requests.HTTPError(
-                f"Unable to retrieve {SYSTEM_ENTITY} on EDSM - "
-                f"Status: {response.status_code}, "
-                f"Response: {response.text}")
+                    f"Unable to retrieve {SYSTEM_ENTITY} on EDSM - "
+                    f"Status: {response.status_code}, "
+                    f"Response: {response.text}")
         else:
             return response.json()
 
     @logit
     @sleep_and_retry
-    @limits(calls=CALL_LIMIT, period=CALL_PERIOD_SEC)
+    @limits(calls=BODY_CALL_LIMIT, period=ONE_MINUTE_CALL_PERIOD)
     def get_bodies_from_system_id(self, system_id: int) -> List[dict]:
         params = self.__get_generic_param_by_entity(BODY_ENTITY)
         params.update({'systemId': system_id})
@@ -86,9 +90,9 @@ class EdsmClient:
 
         if response.status_code != 200:
             raise requests.HTTPError(
-                f"Unable to retrieve {BODY_ENTITY} on EDSM - "
-                f"Status: {response.status_code}, "
-                f"Response: {response.text}")
+                    f"Unable to retrieve {BODY_ENTITY} on EDSM - "
+                    f"Status: {response.status_code}, "
+                    f"Response: {response.text}")
         else:
             self.__log_remaining_rate(response)
             if 'bodies' in response.json():
@@ -98,26 +102,44 @@ class EdsmClient:
 
     @logit
     @sleep_and_retry
-    @limits(calls=CALL_LIMIT, period=CALL_PERIOD_SEC)
-    def get_body_from_system_name(self, system_name: str) -> List[dict]:
-        params = self.__get_generic_param_by_entity(BODY_ENTITY)
-        params.update({'systemName': system_name})
-        url = self.__get_url(BODY_PREFIX, BODY_ENTITY)
+    @limits(calls=SEARCH_CALL_LIMIT, period=ONE_MINUTE_CALL_PERIOD)
+    def search_systems_from_coord(self,
+                                  x_coord: int,
+                                  y_coord: int,
+                                  z_coord: int,
+                                  radius: int) -> List[dict]:
+        '''
+        Call a cube systems search
+        :param x_coord: x axis coordinate
+        :param y_coord: y axis coordinate
+        :param z_coord: z axis coordinate
+        :param radius: the radius of research
+        :return:
+        '''
+        params = self.__get_generic_param_by_entity(CUBE_SEARCH_ENTITY)
+        params.update({
+                'x_coord': x_coord,
+                'y_coord': y_coord,
+                'z_coord': z_coord,
+                'size'   : radius,
+        })
+        url = self.__get_url(SYSTEM_PREFIX, CUBE_SEARCH_ENTITY)
         response: Response = requests.get(url, params)
 
         if response.status_code != 200:
             raise requests.HTTPError(
-                f"Unable to retrieve {BODY_ENTITY} on EDSM - "
-                f"Status: {response.status_code}, "
-                f"Response: {response.text}")
+                    f"Unable to retrieve {CUBE_SEARCH_ENTITY} on EDSM - "
+                    f"Status: {response.status_code}, "
+                    f"Response: {response.text}")
         else:
             self.__log_remaining_rate(response)
-            if 'bodies' in response.json():
-                return response.json()['bodies']
-            else:
-                return []
+            systems = []
+            for elem in response.json():
+                systems.append(elem)
+            self._log.info(f'search_systems_from_coord found {len(systems)} systems')
+            return systems
 
     def __log_remaining_rate(self, response):
         if 'x-rate-limit-remaining' in response.headers:
             self._log.debug(
-                f'remaining call to rate-limit: {response.headers["x-rate-limit-remaining"]}')
+                    f'remaining call to rate-limit: {response.headers["x-rate-limit-remaining"]}')

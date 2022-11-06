@@ -3,9 +3,9 @@ from typing import Optional, List
 
 import structlog
 
-from ..models.eddn_msg import EddnMsg
 from ..decorator.logit import logit
 from ..io.database import Database
+from ..models.eddn_msg import EddnMsg
 
 EDDN_MESSAGE_SELECT_BY_ID = '''
 select id, "schema", header, message, recv_date, sync_date

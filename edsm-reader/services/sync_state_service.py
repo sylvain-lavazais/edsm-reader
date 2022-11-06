@@ -24,7 +24,8 @@ SYNC_STATE_UPDATE_BY_KEY = '''
 update sync_state
 set sync_date = %(sync_date)s,
     type = %(type)s,
-    sync_hash = %(sync_hash)s
+    sync_hash = %(sync_hash)s,
+    previous_state = %(previous_state)s
 where key = %(key)s
 '''
 

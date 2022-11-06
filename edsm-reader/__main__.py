@@ -8,20 +8,20 @@ import structlog as structlog
 from .io.database import Database
 from .io.file import File
 from .orchestrator.eddn_orchestrator import EddnOrchestrator
-from .orchestrator.init_orchestrator import InitOrchestrator
+from .orchestrator.edsm_orchestrator import EdsmOrchestrator
 
 
 class EDSMReader:
-    _init_orchestrator: InitOrchestrator
-    _eddn_orchestrator: EddnOrchestrator
-    _file_tools: File
+    _orchestrator: EdsmOrchestrator
+    _file_tools: File = None
     _parameters: dict
+    _init_thread: Thread
 
     def __init__(self, api_key: str, commander_name: str, log_level: str,
                  init_file_path: str = None):
         self._parameters = {}
         database = self.__build_db_from_param()
-        self._init_orchestrator = InitOrchestrator(database, api_key, commander_name)
+        self._orchestrator = EdsmOrchestrator(database, api_key, commander_name)
         self._eddn_orchestrator = EddnOrchestrator(database)
         if init_file_path is not None:
             self._file_tools = File(init_file_path)
@@ -63,15 +63,9 @@ class EDSMReader:
             self._log.debug(f'===  {key}: {self._parameters[key]}')
 
         if self._file_tools is not None:
-            self.__init_sync_from_edsm()
+            self._file_tools.read_json_file_and_exec(self._orchestrator.refresh_system_list)
 
-        self._eddn_orchestrator.run_listener()
-
-    def __init_sync_from_edsm(self):
-        separated_thread = Thread(target=self._file_tools.read_json_file_and_exec,
-                                  args=(self._init_orchestrator.refresh_system_list,), daemon=True)
-        self._log.info('Starting init database from file')
-        separated_thread.start()
+        self._orchestrator.full_scan_from_coord(0, 0, 0)  # start scan from `Sol` system
 
 
 @click.command(no_args_is_help=True)

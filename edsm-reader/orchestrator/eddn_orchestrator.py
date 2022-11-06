@@ -34,6 +34,6 @@ class EddnOrchestrator:
     def __process_message(self, msg: dict) -> None:
         self._log.info(f'Recording message')
         self._eddn_msg_service.create_eddn_message(
-            EddnMsg(schema=msg['$schemaRef'],
-                    header=msg['header'],
-                    message=msg['message']))
+                EddnMsg(schema=msg['$schemaRef'],
+                        header=msg['header'],
+                        message=msg['message']))
