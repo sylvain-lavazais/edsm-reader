@@ -9,17 +9,28 @@ class Coordinate:
         self._z = z
 
     def is_outside_limit(self, x_origin: float, y_origin: float, z_origin: float,
-                         limit: int) -> bool:
-        x_criteria = True
-        y_criteria = True
-        z_criteria = True
-        if (x_origin + limit) > self._x > (x_origin - limit):
-            x_criteria = False
+                         radius: int) -> bool:
+        '''
+        check if coordinates (x, y, z) set within class are outside a radius
+        :param x_origin: x center coordinate
+        :param y_origin: y center coordinate
+        :param z_origin: z center coordinate
+        :param radius: the radius of exclusion
+        :return: True if coordinates are within (False by default)
+        '''
+        if radius != 0:
+            radius = radius
+            x_criteria = True
+            y_criteria = True
+            z_criteria = True
+            if (x_origin + radius) > self._x > (x_origin - radius):
+                x_criteria = False
 
-        if (y_origin + limit) > self._y > (y_origin - limit):
-            y_criteria = False
+            if (y_origin + radius) > self._y > (y_origin - radius):
+                y_criteria = False
 
-        if (z_origin + limit) > self._z > (z_origin - limit):
-            z_criteria = False
+            if (z_origin + radius) > self._z > (z_origin - radius):
+                z_criteria = False
 
-        return x_criteria and y_criteria and z_criteria
+            return x_criteria and y_criteria and z_criteria
+        return False

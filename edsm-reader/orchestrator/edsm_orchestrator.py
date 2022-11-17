@@ -42,7 +42,7 @@ class EdsmOrchestrator:
                                                 x_coord,
                                                 y_coord,
                                                 z_coord,
-                                                50)
+                                                100)
 
     @logit
     def refresh_system_list(self, data: List[dict]) -> None:
@@ -88,20 +88,20 @@ class EdsmOrchestrator:
         key = {'id': system['id'], 'id64': system['id64']}
         if key not in system_already_registered:
             self._log.info(f'{current_thread()} - system {system["name"]} '
-                           f'not registered yet !')
+                           f'not scanned yet')
             self.__refresh_system_entity(key, system)
             self.__refresh_bodies_entities(key)
             system_already_registered.append(key)
         else:
             self._log.debug(f'{current_thread()} - system {system["name"]} '
-                            f'already been registered')
+                            f'has already been scanned')
 
     def __add_sub_thread(self, radius, scans_done, system, system_already_registered, threads,
                          x_coord, y_coord, z_coord):
         if 'coords' in system:
             coords = system['coords']
             if Coordinate(coords['x'], coords['y'], coords['z']) \
-                    .is_outside_limit(x_coord, y_coord, z_coord, radius):
+                    .is_outside_limit(x_coord, y_coord, z_coord, radius - 10):
                 if (coords['x'], coords['y'], coords['z']) not in scans_done:
                     threads.append(Thread(target=self.__recursive_system_scan_from_coord,
                                           args=(system_already_registered,
@@ -111,10 +111,10 @@ class EdsmOrchestrator:
                                                 coords['z'],
                                                 radius)))
                     self._log.info(f'{current_thread()} - system {system["name"]} '
-                                   f'not scanned yet !')
+                                   f'not searched yet')
                 else:
                     self._log.debug(f'{current_thread()} - system {system["name"]} '
-                                    f'already scanned !')
+                                    f'has already been searched')
 
     def __refresh_bodies_entities(self, key: dict):
         edsm_bodies = self._edsm_client.get_bodies_from_system_id(key['id'])
@@ -130,7 +130,7 @@ class EdsmOrchestrator:
                     edsm_body_hash = self.__compute_hash_of_dict(edsm_body)
 
                     if edsm_body_hash != body_state.sync_hash:
-                        previous_body_state = self.__update_create_body(body_key, edsm_body)
+                        previous_body_state = self.__update_create_body(key, body_key, edsm_body)
                         self.__update_sync_state(edsm_body_hash, body_key, 'body',
                                                  previous_body_state)
 
@@ -160,16 +160,23 @@ class EdsmOrchestrator:
                 self._system_service.create_system(system_from_edsm(edsm_system))
                 self.__create_sync_state(edsm_system, key, 'system')
 
-    def __update_create_body(self, body_key: dict, edsm_body: dict) -> Optional[dict]:
+    def __update_create_body(self,
+                             system_key: dict,
+                             body_key: dict,
+                             edsm_body: dict) -> Optional[dict]:
         body = self._body_service.read_body_by_key(body_key)
 
         if body is not None:
             previous_state = body.to_dict_for_db()
-            self._body_service.update_body_by_key(body_from_edsm(edsm_body))
+            update_body = body_from_edsm(edsm_body)
+            update_body.system_key = system_key
+            self._body_service.update_body_by_key(update_body)
             return previous_state
 
         else:
-            self._body_service.create_body(body_from_edsm(edsm_body))
+            create_body = body_from_edsm(edsm_body)
+            create_body.system_key = system_key
+            self._body_service.create_body(create_body)
 
         return None
 

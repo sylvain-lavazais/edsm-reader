@@ -13,6 +13,7 @@ BODY_PREFIX = "api-system-v1/"
 
 SYSTEM_ENTITY = "system"
 CUBE_SEARCH_ENTITY = "cube-systems"
+SPHERE_SEARCH_ENTITY = "sphere-systems"
 BODY_ENTITY = "bodies"
 
 BODY_CALL_LIMIT = 10
@@ -35,7 +36,9 @@ class EdsmClient:
         return f'{self._base_url}{prefix}{entity}'
 
     def __get_generic_param_by_entity(self, entity: str) -> dict:
-        if entity == SYSTEM_ENTITY or entity == CUBE_SEARCH_ENTITY:
+        if entity == SYSTEM_ENTITY \
+                or entity == CUBE_SEARCH_ENTITY \
+                or entity == SPHERE_SEARCH_ENTITY:
             return {
                     'showCoordinates': 1,
                     'showPermit'     : 1,
@@ -108,22 +111,22 @@ class EdsmClient:
                                   y_coord: int,
                                   z_coord: int,
                                   radius: int) -> List[dict]:
-        '''
-        Call a cube systems search
-        :param x_coord: x axis coordinate
-        :param y_coord: y axis coordinate
-        :param z_coord: z axis coordinate
+        """
+        Call a sphere systems search
+        :param x_coord: x-axis coordinate
+        :param y_coord: y-axis coordinate
+        :param z_coord: z-axis coordinate
         :param radius: the radius of research
-        :return:
-        '''
-        params = self.__get_generic_param_by_entity(CUBE_SEARCH_ENTITY)
+        :return: list of system from the response of edsm
+        """
+        params = self.__get_generic_param_by_entity(SPHERE_SEARCH_ENTITY)
         params.update({
                 'x_coord': x_coord,
                 'y_coord': y_coord,
                 'z_coord': z_coord,
-                'size'   : radius,
+                'radius' : radius,
         })
-        url = self.__get_url(SYSTEM_PREFIX, CUBE_SEARCH_ENTITY)
+        url = self.__get_url(SYSTEM_PREFIX, SPHERE_SEARCH_ENTITY)
         response: Response = requests.get(url, params)
 
         if response.status_code != 200:
