@@ -6,25 +6,20 @@ import click
 import structlog as structlog
 
 from .io.database import Database
-from .io.file import File
-from .orchestrator.eddn_orchestrator import EddnOrchestrator
 from .orchestrator.edsm_orchestrator import EdsmOrchestrator
 
 
 class EDSMReader:
     _orchestrator: EdsmOrchestrator
-    _file_tools: File = None
     _parameters: dict
     _init_thread: Thread
 
-    def __init__(self, api_key: str, commander_name: str, log_level: str,
-                 init_file_path: str = None):
+    def __init__(self, log_level: str):
+        if log_level is None:
+            log_level = 'INFO'
         self._parameters = {}
         database = self.__build_db_from_param()
-        self._orchestrator = EdsmOrchestrator(database, api_key, commander_name)
-        self._eddn_orchestrator = EddnOrchestrator(database)
-        if init_file_path is not None:
-            self._file_tools = File(init_file_path)
+        self._orchestrator = EdsmOrchestrator(database)
 
         structlog.configure(
                 wrapper_class=structlog.make_filtering_bound_logger(
@@ -33,10 +28,7 @@ class EDSMReader:
         self._log = structlog.get_logger()
 
         self._parameters.update({
-                'api_key'       : api_key,
-                'commander_name': commander_name,
-                'init_file_path': init_file_path,
-                'log_level'     : log_level
+                'log_level': log_level
         })
 
     def __build_db_from_param(self):
@@ -62,31 +54,17 @@ class EDSMReader:
         for key in self._parameters:
             self._log.debug(f'===  {key}: {self._parameters[key]}')
 
-        if self._file_tools is not None:
-            self._file_tools.read_json_file_and_exec(self._orchestrator.refresh_system_list)
-
         self._orchestrator.full_scan_from_coord(0, 0, 0)  # start scan from `Sol` system
 
 
-@click.command(no_args_is_help=True)
-@click.option('--api_key', help="The EDSM api key")
-@click.option('--commander_name', help="The EDSM registered commander name")
-@click.option('--init_file_path', help="The file path to the system json file for init")
+@click.command()
 @click.option('--log_level', help="The log level for trace")
-def command_line(api_key: str, commander_name: str, init_file_path: str, log_level: str):
+def command_line(log_level: str = 'INFO'):
     """Start the edsm reader application
 
     example:
-    python -m edsm-reader \
-    --api_key [<your api_key>] \
-    --commander_name [name] \
-    --init_file_path [path/to/file] \
-    --log_level [CRITICAL|ERROR|WARNING|INFO|DEBUG]
+    edsm-reader -log_level [CRITICAL|ERROR|WARNING|INFO|DEBUG]
     """
     print(f'=== Starting {EDSMReader.__name__} ===')
-    edsm_reader = EDSMReader(api_key, commander_name, log_level, init_file_path)
+    edsm_reader = EDSMReader(log_level)
     edsm_reader.run()
-
-
-if __name__ == '__main__':
-    command_line()

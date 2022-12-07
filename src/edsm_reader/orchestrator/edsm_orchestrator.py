@@ -24,12 +24,12 @@ class EdsmOrchestrator:
     _system_service: SystemService
     _edsm_client: EdsmClient
 
-    def __init__(self, db: Database, api_key: str, commander_name: str):
+    def __init__(self, db: Database):
         self._state_service = SyncStateService(db)
         self._body_service = BodyService(db)
         self._system_service = SystemService(db)
 
-        self._edsm_client = EdsmClient(api_key, commander_name)
+        self._edsm_client = EdsmClient()
 
         self._log = structlog.get_logger()
 

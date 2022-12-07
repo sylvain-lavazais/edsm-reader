@@ -23,12 +23,8 @@ ONE_MINUTE_CALL_PERIOD = 60
 
 class EdsmClient:
     _base_url: str
-    _api_key: str
-    _commander_name: str
 
-    def __init__(self, api_key: str, commander_name: str):
-        self._api_key = api_key
-        self._commander_name = commander_name
+    def __init__(self):
         self._base_url = os.getenv("EDSM_BASE_URL", default="https://edsm.net/")
         self._log = structlog.get_logger()
 

@@ -19,7 +19,6 @@ class Coordinate:
         :return: True if coordinates are within (False by default)
         '''
         if radius != 0:
-            radius = radius
             x_criteria = True
             y_criteria = True
             z_criteria = True

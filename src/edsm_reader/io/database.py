@@ -20,6 +20,12 @@ class Database:
         self.db_name = db_name
         self.db_pass = db_password
         self._log = structlog.get_logger()
+        self.__try_connection()
+
+    def __try_connection(self):
+        with self.__db_connection() as connection:
+            with connection.cursor(cursor_factory=DictCursor) as cursor:
+                cursor.execute('SELECT 1')
 
     def __db_connection(self):
         try:
