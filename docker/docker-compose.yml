@@ -4,16 +4,16 @@ services:
   database:
     image: postgres:alpine
     environment:
-      POSTGRES_PASSWORD: edsm-mirror
-      POSTGRES_USER: edsm-mirror
-      POSTGRES_DB: edsm-mirror
+      POSTGRES_PASSWORD: astraeus
+      POSTGRES_USER: astraeus
+      POSTGRES_DB: astraeus-db
     ports:
       - 5432:5432
     volumes:
-      - "edsm-mirror-db:/var/lib/postgresql/data"
+      - "astraeus-db:/var/lib/postgresql/data"
       - "./init-scripts:/docker-entrypoint-initdb.d"
     command: ["postgres", "-c", "log_statement=all"]
 
 volumes:
-  edsm-mirror-db:
+  astraeus-db:
     external: true

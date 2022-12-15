@@ -15,8 +15,8 @@ db-local-apply: .revolve-dep ## Apply database migrations scripts
 
 db-local-reset: ## Fully reset local db (use Docker)
 	@docker compose -f docker/docker-compose.yml down -v || true
-	@docker volume rm edsm-mirror-db || true
-	@docker volume create edsm-mirror-db
+	@docker volume rm astraeus-db || true
+	@docker volume create astraeus-db
 	@docker compose -f docker/docker-compose.yml up -d
 	@sleep 5
 	@make db-local-apply

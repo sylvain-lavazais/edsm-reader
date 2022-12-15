@@ -1,0 +1,10 @@
+include *.iml
+include *.txt
+include Makefile
+include yoyo-local.ini
+include yoyo.ini
+recursive-include db *.sql
+recursive-include doc *.json
+recursive-include docker *.sh
+recursive-include docker *.yml
+recursive-include test *.json

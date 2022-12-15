@@ -34,9 +34,9 @@ class EDSMReader:
     def __build_db_from_param(self):
         db_host = os.getenv("DB_HOST", default="localhost")
         db_port = os.getenv("DB_PORT", default="5432")
-        db_user = os.getenv("DB_USER", default="edsm-mirror")
-        db_name = os.getenv("DB_NAME", default="edsm-mirror")
-        db_password = os.getenv("DB_PASSWORD", default="edsm-mirror")
+        db_user = os.getenv("DB_USER", default="astraeus")
+        db_name = os.getenv("DB_NAME", default="astraeus-db")
+        db_password = os.getenv("DB_PASSWORD", default="astraeus")
         database = Database(db_host, db_port, db_user, db_name, db_password)
 
         self._parameters.update({
