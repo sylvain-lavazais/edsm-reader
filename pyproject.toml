@@ -38,7 +38,7 @@ readme = "README.md" # Optional
 # 'Programming Language' classifiers above, 'pip install' will check this
 # and refuse to install the project if the version does not match. See
 # https://packaging.python.org/guides/distributing-packages-using-setuptools/#python-requires
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 
 # This is either text indicating the license for the distribution, or a file
 # that contains the license
@@ -100,14 +100,12 @@ classifiers = [# Optional
 # For an analysis of this field vs pip's requirements files see:
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
 dependencies = [# Optional
-    "yoyo-migrations",
-    "psycopg2",
-    "psycopg2-binary",
-    "click",
-    "requests",
-    "structlog",
-    "ratelimit",
-    "backoff",
+    "click~=8.1.3",
+    "requests~=2.28.1",
+    "structlog~=22.3.0",
+    "ratelimit~=2.2.1",
+    "backoff~=2.2.1",
+    "astraeus-common @ git+https://github.com/lx-dev-pm/astraeus-common.git@main"
 ]
 
 # List additional groups of dependencies here (e.g. development

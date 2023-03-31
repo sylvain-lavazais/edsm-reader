@@ -1,2 +1,0 @@
-class SyncStateNotFound(Exception):
-    pass

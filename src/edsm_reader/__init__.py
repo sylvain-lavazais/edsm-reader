@@ -5,7 +5,8 @@ from threading import Thread
 import click
 import structlog as structlog
 
-from .io.database import Database
+from astraeus_common.io.database import Database
+
 from .orchestrator.edsm_orchestrator import EdsmOrchestrator
 
 
@@ -17,15 +18,16 @@ class EDSMReader:
     def __init__(self, log_level: str):
         if log_level is None:
             log_level = 'INFO'
-        self._parameters = {}
-        database = self.__build_db_from_param()
-        self._orchestrator = EdsmOrchestrator(database)
 
         structlog.configure(
                 wrapper_class=structlog.make_filtering_bound_logger(
                         logging.getLevelName(log_level)),
         )
         self._log = structlog.get_logger()
+
+        self._parameters = {}
+        database = self.__build_db_from_param()
+        self._orchestrator = EdsmOrchestrator(database)
 
         self._parameters.update({
                 'log_level': log_level
@@ -50,7 +52,7 @@ class EDSMReader:
         return database
 
     def run(self):
-        self._log.debug(f'===  Starting parameters')
+        self._log.debug('===  Starting parameters')
         for key in self._parameters:
             self._log.debug(f'===  {key}: {self._parameters[key]}')
 

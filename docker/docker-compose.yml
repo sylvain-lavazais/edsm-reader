@@ -2,17 +2,26 @@ version: '3.7'
 
 services:
   database:
-    image: postgres:alpine
+    image: 'postgres:alpine'
     environment:
-      POSTGRES_PASSWORD: astraeus
-      POSTGRES_USER: astraeus
-      POSTGRES_DB: astraeus-db
+      POSTGRES_PASSWORD: 'astraeus'
+      POSTGRES_USER: 'astraeus'
+      POSTGRES_DB: 'astraeus-db'
     ports:
-      - 5432:5432
+      - '5432:5432'
     volumes:
-      - "astraeus-db:/var/lib/postgresql/data"
-      - "./init-scripts:/docker-entrypoint-initdb.d"
-    command: ["postgres", "-c", "log_statement=all"]
+      - 'astraeus-db:/var/lib/postgresql/data'
+      - './init-scripts:/docker-entrypoint-initdb.d'
+    command: ['postgres', '-c', 'log_statement=all']
+
+  app:
+    image: 'edsm-reader:latest'
+    environment:
+      DB_HOST: 'database'
+      DB_PORT: '5432'
+      DB_USER: 'astraeus'
+      DB_NAME: 'astraeus-db'
+      DB_PASSWORD: 'astraeus'
 
 volumes:
   astraeus-db:

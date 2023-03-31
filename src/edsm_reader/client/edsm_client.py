@@ -6,7 +6,7 @@ import structlog
 from ratelimit import limits, sleep_and_retry
 from requests import Response
 
-from ..decorator.logit import logit
+from astraeus_common.decorator.logit import logit
 
 SYSTEM_PREFIX = "api-v1/"
 BODY_PREFIX = "api-system-v1/"
