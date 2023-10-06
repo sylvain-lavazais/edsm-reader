@@ -65,6 +65,7 @@ class EdsmOrchestrator:
                                            y_coord: int,
                                            z_coord: int,
                                            radius: int):
+
         scans_done.append((x_coord, y_coord, z_coord))
         systems = self._edsm_client.search_systems_from_coord(x_coord, y_coord, z_coord, radius)
         self._log.info(f'{current_thread()} - => Processing system search '
@@ -153,7 +154,7 @@ class EdsmOrchestrator:
 
                 if edsm_sys_hash != sync_state.sync_hash:
                     previous_system_state = self.__update_create_system(key, edsm_system)
-                    self._log.info(f'prev : {previous_system_state}')
+                    self._log.debug(f'prev : {previous_system_state}')
                     self.__update_sync_state(edsm_sys_hash, key, 'system', previous_system_state)
 
             else:
