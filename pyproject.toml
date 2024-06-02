@@ -102,8 +102,8 @@ classifiers = [# Optional
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
 dependencies = [# Optional
     "click==8.1.*",
-    "requests==2.31.*",
-    "structlog==22.3.*",
+    "requests==2.32.*",
+    "structlog==24.2.*",
     "ratelimit==2.2.*",
     "backoff==2.2.*",
     "astraeus-common @ git+https://github.com/sylvain-lavazais/astraeus-common.git@main"
