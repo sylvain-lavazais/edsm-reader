@@ -68,8 +68,8 @@ class EDSMOrchestrator:
 
         scans_done.append((x_coord, y_coord, z_coord))
         systems = self._edsm_client.search_systems_from_coord(x_coord, y_coord, z_coord, radius)
-        self._log.info(f'{current_thread()} - => Processing system search '
-                       f'on x:{x_coord}, y:{y_coord}, z:{z_coord}')
+        self._log.debug(f'{current_thread()}')
+        self._log.info(f'Processing system search on x:`{x_coord}`, y:`{y_coord}`, z:`{z_coord}`')
 
         threads = []
         for system in systems:
@@ -88,14 +88,14 @@ class EDSMOrchestrator:
     def __register_system_and_bodies(self, system, system_already_registered):
         key = {'id': system['id'], 'id64': system['id64']}
         if key not in system_already_registered:
-            self._log.info(f'{current_thread()} - system {system["name"]} '
-                           f'not scanned yet')
+            self._log.debug(f'{current_thread()}')
+            self._log.info(f'[scan]Processing system:`{system["name"]}` key:`{json.dumps(key)}`')
             self.__refresh_system_entity(key, system)
             self.__refresh_bodies_entities(key)
             system_already_registered.append(key)
         else:
-            self._log.debug(f'{current_thread()} - system {system["name"]} '
-                            f'has already been scanned')
+            self._log.debug(f'{current_thread()}')
+            self._log.info(f'[scan]Skipping System: `{system["name"]}` (already registered)')
 
     def __add_sub_thread(self, radius, scans_done, system, system_already_registered, threads,
                          x_coord, y_coord, z_coord):
@@ -111,16 +111,16 @@ class EDSMOrchestrator:
                                                 coords['y'],
                                                 coords['z'],
                                                 radius)))
-                    self._log.info(f'{current_thread()} - system {system["name"]} '
-                                   f'not searched yet')
+                    self._log.debug(f'{current_thread()}')
+                    self._log.info(f'[recursive search]Processing a recursing system search :`{system["name"]}`')
                 else:
-                    self._log.debug(f'{current_thread()} - system {system["name"]} '
-                                    f'has already been searched')
+                    self._log.debug(f'{current_thread()}')
+                    self._log.info(f'[recursive search]Skipping System: `{system["name"]}` (already registered)')
 
-    def __refresh_bodies_entities(self, key: dict):
+    def __refresh_bodies_entities(self, key: dict, system_name: str):
         edsm_bodies = self._edsm_client.get_bodies_from_system_id(key['id'])
         if len(edsm_bodies) > 0:
-            self._log.info(f'=> Processing {len(edsm_bodies)} bodies for system {key}')
+            self._log.info(f'[body scan]Processing:`{len(edsm_bodies)}` bodies of system:`{system_name}`')
 
             for edsm_body in edsm_bodies:
 
