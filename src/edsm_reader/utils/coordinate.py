@@ -10,14 +10,14 @@ class Coordinate:
 
     def is_outside_limit(self, x_origin: float, y_origin: float, z_origin: float,
                          radius: int) -> bool:
-        '''
+        """
         check if coordinates (x, y, z) set within class are outside a radius
         :param x_origin: x center coordinate
         :param y_origin: y center coordinate
         :param z_origin: z center coordinate
         :param radius: the radius of exclusion
         :return: True if coordinates are within (False by default)
-        '''
+        """
         if radius != 0:
             x_criteria = True
             y_criteria = True

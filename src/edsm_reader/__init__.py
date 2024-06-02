@@ -7,11 +7,11 @@ import structlog as structlog
 
 from astraeus_common.io.database import Database
 
-from .orchestrator.edsm_orchestrator import EdsmOrchestrator
+from .orchestrator.edsm_orchestrator import EDSMOrchestrator
 
 
 class EDSMReader:
-    _orchestrator: EdsmOrchestrator
+    _orchestrator: EDSMOrchestrator
     _parameters: dict
     _init_thread: Thread
 
@@ -27,7 +27,7 @@ class EDSMReader:
 
         self._parameters = {}
         database = self.__build_db_from_param()
-        self._orchestrator = EdsmOrchestrator(database)
+        self._orchestrator = EDSMOrchestrator(database)
 
         self._parameters.update({
                 'log_level': log_level
@@ -62,7 +62,7 @@ class EDSMReader:
 @click.command()
 @click.option('--log_level', help="The log level for trace")
 def command_line(log_level: str = 'INFO'):
-    """Start the edsm reader application
+    """Start the EDSM reader application
 
     example:
     edsm-reader -log_level [CRITICAL|ERROR|WARNING|INFO|DEBUG]

@@ -18,7 +18,7 @@ from ..services.system_service import SystemService
 from ..utils.coordinate import Coordinate
 
 
-class EdsmOrchestrator:
+class EDSMOrchestrator:
     _state_service: SyncStateService
     _body_service: BodyService
     _system_service: SystemService
@@ -65,6 +65,7 @@ class EdsmOrchestrator:
                                            y_coord: int,
                                            z_coord: int,
                                            radius: int):
+
         scans_done.append((x_coord, y_coord, z_coord))
         systems = self._edsm_client.search_systems_from_coord(x_coord, y_coord, z_coord, radius)
         self._log.info(f'{current_thread()} - => Processing system search '
@@ -153,7 +154,7 @@ class EdsmOrchestrator:
 
                 if edsm_sys_hash != sync_state.sync_hash:
                     previous_system_state = self.__update_create_system(key, edsm_system)
-                    self._log.info(f'prev : {previous_system_state}')
+                    self._log.debug(f'prev : {previous_system_state}')
                     self.__update_sync_state(edsm_sys_hash, key, 'system', previous_system_state)
 
             else:
@@ -196,23 +197,23 @@ class EdsmOrchestrator:
     def __update_sync_state(self, object_hash: str, key_to_save: dict, data_type: str,
                             previous_state: dict = None) -> None:
         new_sync = SyncState(
-                key=key_to_save,
-                data_type=data_type,
-                sync_hash=object_hash,
-                previous_state=previous_state
+            key=key_to_save,
+            data_type=data_type,
+            sync_hash=object_hash,
+            previous_state=previous_state
         )
         self._state_service.update_sync_state(new_sync)
 
     def __create_sync_state(self, edsm_dict: dict, key_to_save: dict, data_type: str) -> None:
         sync = SyncState(
-                key=key_to_save,
-                data_type=data_type,
-                sync_hash=self.__compute_hash_of_dict(edsm_dict)
+            key=key_to_save,
+            data_type=data_type,
+            sync_hash=self.__compute_hash_of_dict(edsm_dict)
         )
         self._state_service.create_sync_state(sync)
 
     def __compute_hash_of_dict(self, data: dict) -> str:
         result = hashlib.sha256(
-                bytes(json.dumps(data, sort_keys=True, default=str), 'utf-8')).hexdigest()
+            bytes(json.dumps(data, sort_keys=True, default=str), 'utf-8')).hexdigest()
         self._log.debug(f'hash of {data} = {result}')
         return result

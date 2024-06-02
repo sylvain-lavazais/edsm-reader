@@ -1,12 +1,15 @@
-##  -------
-##@ Install
-##  -------
 
-db-local-apply: .revolve-dep ## Apply database migrations scripts
+##  --------
+##@ Database
+##  --------
+
+db-local-apply: ## Apply database migrations scripts
+	@echo "===> $@ <==="
 	@python -m yoyo --config yoyo-local.ini apply
 .PHONY: db-local-apply
 
 db-local-reset: ## Fully reset local db (use Docker)
+	@echo "===> $@ <==="
 	@docker compose -f docker/docker-compose.yml down -v || true
 	@docker volume rm astraeus-db || true
 	@docker volume create astraeus-db
@@ -15,13 +18,19 @@ db-local-reset: ## Fully reset local db (use Docker)
 	@make db-local-apply
 .PHONY: db-local-reset
 
-install: .revolve-dep ## Install locally the application
+##  -------
+##@ Install
+##  -------
+
+install: ## Install locally the application
+	@echo "===> $@ <==="
 	@rm -rf build dist
 	@python -m build
 	@pip install --force-reinstall --editable .
 .PHONY: install
 
-build: .revolve-dep ## Build the application
+build: ## Build the application
+	@echo "===> $@ <==="
 	@python -m build
 
 ##  ----
@@ -29,16 +38,13 @@ build: .revolve-dep ## Build the application
 ##  ----
 
 run: ## Run locally the application
+	@echo "===> $@ <==="
 	@python -m edsm-reader
 .PHONY: run
 
 ##  ----
 ##@ Misc
 ##  ----
-
-.revolve-dep:
-	@python -m pip install -r requirements.txt
-.PHONY: .revolve-dep
 
 .DEFAULT_GOAL := help
 APPLICATION_TITLE := Astraeus - edsm-reader \n ================
